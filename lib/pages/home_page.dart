@@ -49,6 +49,12 @@ class _HomePageState extends State<HomePage> {
         userName = val!;
       });
     });
+    // geting the list of snapshots in our stream
+    await DatabaseService(uid: FirebaseAuth.instance.currentUser!.uid)
+        .getUserGroups()
+        .then((snapshot) {
+      groups = snapshot;
+    });
   }
 
   @override
@@ -110,10 +116,12 @@ class _HomePageState extends State<HomePage> {
             ),
             ListTile(
               onTap: () {
-                nextScreenReplace(context, ProfilePage(
-                  userName: userName,
-                  email: email,
-                ));
+                nextScreenReplace(
+                    context,
+                    ProfilePage(
+                      userName: userName,
+                      email: email,
+                    ));
               },
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
@@ -170,6 +178,70 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
+      body: groupList(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          popUpDialog(context);
+        },
+        elevation: 0,
+        backgroundColor: Theme.of(context).primaryColor,
+        child: const Icon(Icons.add, color: Colors.white, size: 30),
+      ),
     );
+  }
+
+  popUpDialog(BuildContext context) {}
+
+  groupList() {
+    return StreamBuilder(
+      stream: groups,
+      builder: (context, AsyncSnapshot snapshot) {
+        // make some checks
+        if (snapshot.hasData) {
+          if (snapshot.data['groups'] != null) {
+            if (snapshot.data['groups'].length != 0) {
+              return Text("HOLA PAPU");
+            } else {
+              return noGroupWidget();
+            }
+          } else {
+            return noGroupWidget();
+          }
+        } else {
+          return Center(
+            child: CircularProgressIndicator(
+                color: Theme.of(context).primaryColor),
+          );
+        }
+      },
+    );
+  }
+
+  noGroupWidget() {
+    return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 25),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            GestureDetector(
+              onTap: () {
+                popUpDialog(context);
+              },
+              child: Icon(
+                Icons.add_circle,
+                color: Colors.grey[700],
+                size: 75,
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            const Text(
+              "Usted, no está unido a ningún grupo, toque en el botón de agregar para crear un grupo o buscar uno en la lupa de arriba.",
+              textAlign: TextAlign.center,
+            )
+          ],
+        ));
   }
 }
