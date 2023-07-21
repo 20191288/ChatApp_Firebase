@@ -1,19 +1,20 @@
-import 'package:chatapp_firebase/pages/auth/register_page.dart';
-import 'package:chatapp_firebase/widgets/widgets.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+import '../../widgets/widgets.dart';
+
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   final formKey = GlobalKey<FormState>();
   String email = "";
   String password = "";
+  String fullName = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,11 +36,34 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 const SizedBox(height: 10),
                 const Text(
-                  "Únete a más de -6 usuarios!",
+                  "Crea tu cuenta y vende tu alma al diablo!",
                   style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400)
                   ),
-                Image.asset("assets/login.jpeg"),
+                Image.asset("assets/register.jpg"),
                 const SizedBox(height: 25),
+                TextFormField(
+                  decoration: textInputDecoration.copyWith(
+                      labelText: "Nombre completo",
+                      prefixIcon: Icon(
+                        Icons.person,
+                        color: Theme.of(context).primaryColor,
+                      )),
+                  onChanged: (val) {
+                    setState(() {
+                      fullName = val;
+                    });
+                  },
+                  validator: (val) {
+                    if (val!.isNotEmpty) {
+                      return null;
+                    } else {
+                      return "Nombre no puede ser vacío";
+                    }
+                  },
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
                 TextFormField(
                   decoration: textInputDecoration.copyWith(
                     labelText: "Email",
@@ -98,12 +122,12 @@ class _LoginPageState extends State<LoginPage> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30))),
                     child: const Text(
-                      "Ingresar",
+                      "Registrarse",
                       style:
                           TextStyle(color: Colors.white, fontSize: 16),
                     ),
                     onPressed: () {
-                      login();
+                      register();
                     },
                   ),
                 ),
@@ -111,12 +135,12 @@ class _LoginPageState extends State<LoginPage> {
                   height: 10,
                 ),
                 Text.rich(TextSpan(
-                  text: "No tienes una cuenta? ",
+                  text: "Ya creaste tu cuenta? ",
                   style: const TextStyle(
                       color: Colors.black, fontSize: 14),
                   children: <TextSpan>[
                     TextSpan(
-                        text: "Registrate aquí",
+                        text: "Ingresa aquí",
                         style: const TextStyle(
                             color: Colors.black,
                             decoration: TextDecoration.underline),
@@ -133,8 +157,7 @@ class _LoginPageState extends State<LoginPage> {
       )
     );
   }
-
-  login() {
+  register() {
 
   }
 }
