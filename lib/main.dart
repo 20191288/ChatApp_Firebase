@@ -2,6 +2,7 @@ import 'package:chatapp_firebase/helpers/helper_function.dart';
 import 'package:chatapp_firebase/pages/auth/login_page.dart';
 import 'package:chatapp_firebase/pages/home_page.dart';
 import 'package:chatapp_firebase/shared/constants.dart';
+import 'package:chatapp_firebase/splash.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
@@ -9,7 +10,7 @@ import 'package:flutter/foundation.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (kIsWeb){
+  if (kIsWeb) {
     await Firebase.initializeApp(
         options: FirebaseOptions(
             apiKey: Constants.apiKey,
@@ -31,7 +32,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   bool _isSignedIn = false;
 
   @override
@@ -42,22 +42,19 @@ class _MyAppState extends State<MyApp> {
 
   getUserLoggedInStatus() async {
     await HelperFunctions.getUserLoggedInStatus().then((value) {
-      if (value != null){
+      if (value != null) {
         _isSignedIn = value;
       }
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        primaryColor: Constants().primaryColor,
-        scaffoldBackgroundColor: Colors.white
-      ),
-      debugShowCheckedModeBanner: false,
-      home: _isSignedIn ? const HomePage() : const LoginPage()
-    );
+        theme: ThemeData(
+            primaryColor: Constants().primaryColor,
+            scaffoldBackgroundColor: Colors.white),
+        debugShowCheckedModeBanner: false,
+        home: Splash());
   }
 }
