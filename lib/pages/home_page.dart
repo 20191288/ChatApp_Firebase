@@ -2,6 +2,8 @@ import 'package:chatapp_firebase/pages/auth/login_page.dart';
 import 'package:chatapp_firebase/pages/profile_page.dart';
 import 'package:chatapp_firebase/pages/search_page.dart';
 import 'package:chatapp_firebase/service/auth_service.dart';
+import 'package:chatapp_firebase/widgets/group_tile.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../helpers/helper_function.dart';
@@ -190,7 +192,84 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  popUpDialog(BuildContext context) {}
+  popUpDialog(BuildContext context) {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(builder: ((context, setState) {
+            return AlertDialog(
+              title: const Text(
+                "Crear un Grupo",
+                textAlign: TextAlign.left,
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _isLoading == true
+                      ? Center(
+                          child: CircularProgressIndicator(
+                              color: Theme.of(context).primaryColor),
+                        )
+                      : TextField(
+                          onChanged: (val) {
+                            setState(() {
+                              groupName = val;
+                            });
+                          },
+                          style: const TextStyle(color: Colors.black),
+                          decoration: InputDecoration(
+                            enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Theme.of(context).primaryColor),
+                                borderRadius: BorderRadius.circular(20)),
+                            errorBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(color: Colors.red),
+                                borderRadius: BorderRadius.circular(20)),
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                    color: Theme.of(context).primaryColor),
+                                borderRadius: BorderRadius.circular(20)),
+                          ),
+                        ),
+                ],
+              ),
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                      primary: Theme.of(context).primaryColor),
+                  child: const Text("CANCELAR"),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (groupName != "") {
+                      setState(() {
+                        _isLoading = true;
+                      });
+                      DatabaseService(
+                              uid: FirebaseAuth.instance.currentUser!.uid)
+                          .createGroup(userName,
+                              FirebaseAuth.instance.currentUser!.uid, groupName)
+                          .whenComplete(() {
+                        _isLoading = false;
+                      });
+                      Navigator.of(context).pop();
+                      showSnackbar(
+                          context, Colors.green, "Grupo creado exitosamente.");
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                      primary: Theme.of(context).primaryColor),
+                  child: const Text("CREAR"),
+                )
+              ],
+            );
+          }));
+        });
+  }
 
   groupList() {
     return StreamBuilder(
@@ -200,7 +279,16 @@ class _HomePageState extends State<HomePage> {
         if (snapshot.hasData) {
           if (snapshot.data['groups'] != null) {
             if (snapshot.data['groups'].length != 0) {
-              return Text("HOLA PAPU");
+              return ListView.builder(
+                itemCount: snapshot.data['groups'].length,
+                itemBuilder: (context, index) {
+                  int reverseIndex = snapshot.data['groups'].length - index - 1;
+                  return GroupTile(
+                      groupId: getId(snapshot.data['groups'][reverseIndex]),
+                      groupName: getName(snapshot.data['groups'][reverseIndex]),
+                      userName: snapshot.data['fullName']);
+                },
+              );
             } else {
               return noGroupWidget();
             }
